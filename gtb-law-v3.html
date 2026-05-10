@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTB Law | Compliance Médico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#03091f;
+  --ink-60:rgba(3,9,31,.60);
+  --ink-30:rgba(3,9,31,.30);
+  --ink-10:rgba(3,9,31,.10);
+  --ink-06:rgba(3,9,31,.06);
+  --paper:#ece8e1;
+  --white:#ffffff;
+  --glass-bg:rgba(255,255,255,.28);
+  --glass-border:rgba(255,255,255,.48);
+  --glass-light:rgba(255,255,255,.16);
+  --red:#b83232;
+  --red-bg:rgba(184,50,50,.07);
+  --red-border:rgba(184,50,50,.16);
+  --green:#1a7a4a;
+  --green-bg:rgba(26,122,74,.07);
+  --green-border:rgba(26,122,74,.16);
+  --amber:#8a6000;
+  --amber-bg:rgba(138,96,0,.07);
+  --amber-border:rgba(138,96,0,.16);
+  --r-lg:32px;--r-md:20px;--r-sm:14px;--r-pill:999px;
+}
+
+html{font-size:16px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;overflow-x:hidden}
+
+/* TEXTURE */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  opacity:.5;
+}
+.blob{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.b1{width:520px;height:520px;background:radial-gradient(circle,rgba(190,210,255,.50),transparent 70%);top:-110px;right:-70px;}
+.b2{width:420px;height:420px;background:radial-gradient(circle,rgba(255,242,200,.44),transparent 70%);bottom:40px;left:-90px;}
+
+/* LAYOUT */
+.app{position:relative;z-index:1;min-height:100vh;padding:20px;display:flex;flex-direction:column;}
+.shell{
+  flex:1;display:flex;flex-direction:column;
+  border-radius:var(--r-lg);
+  background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(255,255,255,.10));
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
+  box-shadow:0 40px 100px rgba(3,9,31,.08),inset 0 0 0 1px rgba(255,255,255,.12);
+  overflow:hidden;
+}
+
+/* HEADER */
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;height:72px;
+  border-bottom:1px solid var(--ink-06);flex-shrink:0;
+}
+.brand{display:flex;align-items:center;gap:12px;}
+.logo-mark{
+  width:38px;height:38px;border-radius:12px;background:var(--ink);
+  color:var(--white);display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:18px;flex-shrink:0;
+}
+.brand-name{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.04em;}
+.header-badge{
+  font-size:10px;font-weight:600;letter-spacing:.14em;color:var(--ink-60);
+  text-transform:uppercase;padding:6px 14px;border-radius:var(--r-pill);
+  background:var(--glass-light);border:1px solid var(--glass-border);white-space:nowrap;
+}
+
+/* PAGES */
+.page{flex:1;display:none;flex-direction:column;min-height:0;}
+.page.active{display:flex;}
+
+/* ─── HOME ─── */
+#homePage{flex-direction:row;align-items:stretch;}
+.home-left{
+  flex:1.1;display:flex;flex-direction:column;justify-content:center;
+  padding:64px 56px;min-width:0;
+}
+.home-right{
+  flex:.9;display:flex;align-items:stretch;min-width:0;
+  padding:20px 20px 20px 0;
+}
+.hero-img-wrap{
+  width:100%;border-radius:26px;overflow:hidden;position:relative;
+  background:linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.08));
+  border:1px solid var(--glass-border);min-height:400px;
+}
+.hero-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.hero-ph{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:40px;text-align:center;
+}
+.hero-ph svg{opacity:.15;}
+.hero-ph p{font-size:12px;color:var(--ink-30);letter-spacing:.04em;max-width:200px;line-height:1.6;}
+.hero-badge{
+  position:absolute;bottom:24px;left:24px;
+  background:rgba(3,9,31,.72);backdrop-filter:blur(14px);
+  color:var(--white);padding:12px 18px;border-radius:var(--r-sm);
+  border:1px solid rgba(255,255,255,.12);
+}
+.hero-badge-title{font-family:'DM Serif Display',serif;font-size:18px;letter-spacing:-.03em;}
+.hero-badge-sub{font-size:11px;color:rgba(255,255,255,.50);margin-top:3px;}
+
+/* EYEBROW */
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:var(--r-pill);
+  background:var(--glass-light);border:1px solid var(--glass-border);
+  font-size:10px;font-weight:600;letter-spacing:.15em;color:var(--ink-60);
+  text-transform:uppercase;margin-bottom:28px;width:fit-content;
+  animation:fadeUp .6s ease both;
+}
+.eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--ink);opacity:.4;}
+
+h1{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(36px,3.6vw,66px);line-height:1.04;letter-spacing:-.04em;
+  max-width:680px;animation:fadeUp .6s .1s ease both;
+}
+h1 em{font-style:italic;color:var(--ink-60);}
+.home-desc{margin-top:22px;max-width:480px;font-size:16px;line-height:1.75;color:var(--ink-60);animation:fadeUp .6s .2s ease both;}
+.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:38px;animation:fadeUp .6s .3s ease both;}
+
+/* BUTTONS */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:50px;padding:0 26px;border-radius:var(--r-pill);
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;
+  border:none;cursor:pointer;transition:all .22s ease;white-space:nowrap;
+}
+.btn:hover{transform:translateY(-2px);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important;}
+.btn-primary{background:var(--ink);color:var(--white);box-shadow:0 6px 20px rgba(3,9,31,.22);}
+.btn-primary:hover{box-shadow:0 10px 28px rgba(3,9,31,.30);}
+.btn-secondary{background:var(--glass-bg);border:1px solid var(--glass-border);color:var(--ink);}
+.btn-secondary:hover{background:rgba(255,255,255,.40);}
+.btn-cta{
+  background:linear-gradient(135deg,var(--ink) 0%,#1a2340 100%);
+  color:var(--white);box-shadow:0 8px 24px rgba(3,9,31,.28);
+  height:54px;font-size:15px;padding:0 32px;
+}
+
+/* ─── QUESTIONNAIRE ─── */
+#questionnairePage{overflow-y:auto;padding:40px 32px;align-items:center;}
+.q-card{
+  width:100%;max-width:800px;border-radius:var(--r-lg);
+  background:linear-gradient(145deg,rgba(255,255,255,.30),rgba(255,255,255,.14));
+  border:1px solid var(--glass-border);padding:52px 48px;
+  animation:fadeUp .4s ease both;
+}
+.q-card h2{
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(28px,3vw,46px);letter-spacing:-.04em;line-height:1.08;
+  margin-top:18px;margin-bottom:12px;
+}
+.q-subtitle{font-size:14px;color:var(--ink-60);line-height:1.65;margin-bottom:36px;max-width:540px;}
+
+/* FIELDS */
+.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:32px;}
+.field{display:flex;flex-direction:column;gap:8px;}
+.field label{font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ink-60);text-transform:uppercase;}
+.field select,.field input{
+  width:100%;height:52px;border-radius:var(--r-sm);
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,.26);padding:0 16px;
+  font-family:'DM Sans',sans-serif;font-size:15px;color:var(--ink);
+  outline:none;transition:border-color .2s,background .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2303091f' stroke-opacity='.4' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 16px center;padding-right:40px;
+  background-color:rgba(255,255,255,.26);
+}
+.field select:focus,.field input:focus{border-color:rgba(3,9,31,.28);background:rgba(255,255,255,.42);}
+
+/* DIVIDER */
+.q-divider{border:none;border-top:1px solid var(--ink-06);margin:8px 0 28px;}
+
+/* UPLOAD */
+.upload-label{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  border-radius:var(--r-md);border:1.5px dashed rgba(3,9,31,.18);
+  background:rgba(255,255,255,.14);padding:32px 24px;
+  cursor:pointer;transition:background .2s,border-color .2s;text-align:center;
+}
+.upload-label:hover{background:rgba(255,255,255,.26);border-color:rgba(3,9,31,.32);}
+.upload-label.has-file{border-style:solid;border-color:var(--green);background:var(--green-bg);}
+.upload-icon-wrap{
+  width:48px;height:48px;border-radius:14px;
+  background:var(--glass-bg);border:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.upload-main-text{font-size:15px;font-weight:600;color:var(--ink);}
+.upload-sub-text{font-size:13px;color:var(--ink-60);line-height:1.5;}
+.upload-file-name{font-size:13px;font-weight:600;color:var(--green);}
+.upload-label input{display:none;}
+
+/* UPLOAD INFO BOX */
+.upload-info{
+  margin-top:14px;padding:14px 18px;border-radius:var(--r-sm);
+  background:rgba(255,255,255,.16);border:1px solid var(--glass-border);
+  display:flex;align-items:flex-start;gap:12px;
+}
+.upload-info-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.upload-info-text{font-size:12px;color:var(--ink-60);line-height:1.65;}
+.upload-info-text strong{color:var(--ink);font-weight:600;}
+
+/* FOOTER */
+.q-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:36px;padding-top:24px;border-top:1px solid var(--ink-06);
+  flex-wrap:wrap;gap:12px;
+}
+.q-footer-note{font-size:12px;color:var(--ink-30);max-width:360px;line-height:1.6;}
+.q-footer-actions{display:flex;gap:10px;}
+
+/* ─── ANALYZING ─── */
+#analyzingPage{align-items:center;justify-content:center;}
+.analyzing-wrap{text-align:center;padding:40px;animation:fadeUp .4s ease both;}
+.analyzing-ring{
+  width:72px;height:72px;border-radius:50%;
+  border:2px solid var(--ink-06);border-top:2px solid var(--ink);
+  animation:spin 1s linear infinite;margin:0 auto 28px;
+}
+.analyzing-wrap h3{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:-.04em;margin-bottom:12px;}
+.analyzing-wrap p{color:var(--ink-60);font-size:15px;line-height:1.7;max-width:400px;}
+.analyzing-steps{margin-top:32px;display:flex;flex-direction:column;gap:8px;text-align:left;max-width:360px;margin-left:auto;margin-right:auto;}
+.analyzing-step{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-radius:var(--r-sm);font-size:13px;color:var(--ink-60);
+  background:rgba(255,255,255,.16);border:1px solid var(--glass-border);
+  transition:all .3s ease;
+}
+.analyzing-step.active{background:rgba(255,255,255,.32);color:var(--ink);border-color:rgba(255,255,255,.50);}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--ink-30);flex-shrink:0;transition:background .3s;}
+.analyzing-step.active .step-dot{background:var(--ink);}
+
+/* ─── RESULT ─── */
+#resultPage{overflow-y:auto;padding:48px 32px;align-items:center;}
+.result-card{
+  width:100%;max-width:760px;border-radius:var(--r-lg);
+  background:linear-gradient(145deg,rgba(255,255,255,.30),rgba(255,255,255,.14));
+  border:1px solid var(--glass-border);padding:52px 48px;
+  text-align:center;animation:fadeUp .4s ease both;
+}
+.result-badge-wrap{margin-bottom:24px;}
+.result-status-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:10px 22px;border-radius:var(--r-pill);
+  font-size:12px;font-weight:700;letter-spacing:.1em;
+}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border);}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border);}
+
+.result-card h2{font-family:'DM Serif Display',serif;font-size:clamp(30px,3.8vw,52px);letter-spacing:-.04em;line-height:1.05;}
+.result-sub{margin-top:16px;font-size:15px;color:var(--ink-60);line-height:1.75;max-width:540px;margin-left:auto;margin-right:auto;}
+
+.result-box{
+  margin-top:28px;border-radius:var(--r-md);
+  background:rgba(255,255,255,.18);border:1px solid var(--glass-border);
+  padding:24px 28px;text-align:left;
+}
+.result-box-title{font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--ink-60);text-transform:uppercase;margin-bottom:16px;}
+.result-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:10px 0;border-bottom:1px solid var(--ink-06);
+  font-size:14px;color:var(--ink-60);line-height:1.6;
+}
+.result-item:last-child{border-bottom:none;}
+.r-dot{
+  width:20px;height:20px;border-radius:50%;flex-shrink:0;margin-top:2px;
+  display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;
+}
+.r-dot-red{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red);}
+.r-dot-green{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green);}
+.r-dot-amber{background:var(--amber-bg);border:1px solid var(--amber-border);color:var(--amber);}
+
+.result-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:36px;}
+
+/* ─── THANK YOU ─── */
+#thankYouPage{align-items:center;justify-content:center;}
+.ty-wrap{text-align:center;max-width:520px;padding:48px 32px;animation:fadeUp .5s ease both;}
+.ty-icon{
+  width:72px;height:72px;border-radius:50%;margin:0 auto 28px;
+  background:var(--green-bg);border:1px solid var(--green-border);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+}
+.ty-wrap h2{font-family:'DM Serif Display',serif;font-size:clamp(34px,4vw,52px);letter-spacing:-.04em;line-height:1.05;margin-bottom:16px;}
+.ty-wrap p{font-size:16px;color:var(--ink-60);line-height:1.75;}
+
+/* ─── MODALS ─── */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(3,9,31,.28);
+  display:none;align-items:center;justify-content:center;
+  z-index:200;padding:24px;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.modal-overlay.open{display:flex;}
+.modal-card{
+  width:100%;max-width:560px;border-radius:var(--r-lg);
+  background:linear-gradient(145deg,rgba(240,236,229,.97),rgba(236,232,225,.94));
+  border:1px solid var(--glass-border);padding:48px;
+  box-shadow:0 40px 80px rgba(3,9,31,.18);
+  animation:fadeUp .3s ease both;
+}
+.modal-card h3{font-family:'DM Serif Display',serif;font-size:34px;letter-spacing:-.04em;line-height:1.08;margin-bottom:8px;}
+.modal-sub{font-size:14px;color:var(--ink-60);margin-bottom:28px;line-height:1.6;}
+.modal-fields{display:flex;flex-direction:column;gap:14px;}
+.modal-fields .field input{background:rgba(255,255,255,.50);border:1px solid rgba(3,9,31,.14);}
+.modal-fields .field input:focus{background:rgba(255,255,255,.80);border-color:rgba(3,9,31,.30);}
+.modal-disclaimer{margin-top:18px;padding:14px 16px;border-radius:var(--r-sm);background:rgba(3,9,31,.04);font-size:11px;color:var(--ink-30);line-height:1.7;}
+.modal-footer{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap;}
+
+/* HOW MODAL */
+#howModal .modal-card{max-width:620px;}
+.how-step{display:flex;gap:18px;padding:14px 0;border-bottom:1px solid var(--ink-06);}
+.how-step:last-child{border-bottom:none;}
+.step-num{width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:2px;}
+.step-text{font-size:14px;color:var(--ink-60);line-height:1.65;padding-top:4px;}
+.how-disclaimer{margin-top:22px;padding:14px 16px;border-radius:var(--r-sm);background:rgba(3,9,31,.04);font-size:12px;color:var(--ink-30);line-height:1.7;}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* RESPONSIVE */
+@media(max-width:960px){
+  #homePage{flex-direction:column;overflow-y:auto;}
+  .home-left{padding:40px 32px 28px;}
+  .home-right{padding:0 32px 40px;}
+  .hero-img-wrap{min-height:260px;aspect-ratio:16/9;}
+  .q-grid{grid-template-columns:1fr;}
+  .q-card{padding:32px 24px;}
+  .result-card{padding:40px 28px;}
+  .modal-card{padding:36px 24px;}
+  .header-badge{display:none;}
+}
+@media(max-width:600px){
+  .app{padding:12px;}
+  .shell{border-radius:24px;}
+  header{padding:0 20px;height:64px;}
+  .q-footer{flex-direction:column;align-items:flex-start;}
+  .q-footer-actions,.result-actions{width:100%;flex-direction:column;}
+  .q-footer-actions .btn,.result-actions .btn,.actions .btn{width:100%;}
+  .modal-card{padding:28px 20px;}
+}
+</style>
+</head>
+<body>
+
+<div class="blob b1"></div>
+<div class="blob b2"></div>
+
+<div class="app">
+<div class="shell">
+
+<!-- HEADER -->
+<header>
+  <div class="brand">
+    <div class="logo-mark">G</div>
+    <div class="brand-name">GTB Law</div>
+  </div>
+  <div class="header-badge">CREMESP 397/26 · Compliance Médico</div>
+</header>
+
+<!-- ═══ HOME ═══ -->
+<section class="page active" id="homePage">
+  <div class="home-left">
+    <div class="eyebrow"><span class="eyebrow-dot"></span>Diagnóstico Contratual</div>
+    <h1>O contrato médico da sua clínica está em <em>conformidade</em> com o CREMESP?</h1>
+    <p class="home-desc">Realize uma análise preliminar da estrutura contratual da sua clínica e identifique potenciais riscos regulatórios antes que se tornem passivos.</p>
+    <div class="actions">
+      <button class="btn btn-primary" onclick="goTo('questionnairePage')">
+        Responder questionário
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="btn btn-secondary" onclick="openModal('howModal')">Como funciona</button>
+    </div>
+  </div>
+  <div class="home-right">
+    <div class="hero-img-wrap" style="overflow:hidden;border-radius:26px;border:1px solid rgba(255,255,255,.44);">
+      <svg width="100%" viewBox="0 0 680 820" xmlns="http://www.w3.org/2000/svg" style="display:block;height:100%;object-fit:cover;">
+
+        <!-- BG bege creme — paleta Instagram GTB Law -->
+        <rect width="680" height="820" fill="#f0ebe2"/>
+
+        <!-- FAIXA PRETA TOPO -->
+        <rect x="0" y="0" width="680" height="200" fill="#1a1a1a"/>
+
+        <!-- TEXTURA PONTILHADA NO ESCURO -->
+        <g fill="#ffffff" opacity="0.04">
+          <rect x="0"   y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="68"  y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="136" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="204" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="272" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="340" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="408" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="476" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="544" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="612" y="36"  width="1.5" height="1.5" rx="1"/>
+          <rect x="0"   y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="68"  y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="136" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="204" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="272" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="340" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="408" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="476" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="544" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="612" y="100" width="1.5" height="1.5" rx="1"/>
+          <rect x="0"   y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="68"  y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="136" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="204" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="272" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="340" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="408" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="476" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="544" y="164" width="1.5" height="1.5" rx="1"/>
+          <rect x="612" y="164" width="1.5" height="1.5" rx="1"/>
+        </g>
+
+        <!-- TÍTULO — branco sobre preto -->
+        <text x="44" y="118" font-family="'DM Serif Display',Georgia,serif" font-size="60" fill="#f0ebe2" letter-spacing="-2" opacity="0.96">Compliance</text>
+        <text x="44" y="182" font-family="'DM Serif Display',Georgia,serif" font-size="60" fill="#f0ebe2" letter-spacing="-2" font-style="italic" opacity="0.90">Médico</text>
+
+        <!-- DIVISÓRIA -->
+        <line x1="0" y1="200" x2="680" y2="200" stroke="#1a1a1a" stroke-width="1" opacity="0.08"/>
+
+        <!-- SUBTÍTULO — limpo, sem GTB Law e sem CREMESP -->
+        <text x="44" y="236" font-family="'DM Sans',Arial,sans-serif" font-size="12" fill="#1a1a1a" opacity="0.40" letter-spacing="0.3">Diagnóstico contratual preliminar para clínicas e hospitais</text>
+        <line x1="44" y1="252" x2="210" y2="252" stroke="#1a1a1a" stroke-width="0.7" opacity="0.12"/>
+
+        <!-- DOC 1 — CONTRATO -->
+        <g transform="translate(44,276) rotate(-1.5)">
+          <rect x="3" y="3" width="172" height="228" rx="6" fill="#1a1a1a" opacity="0.06"/>
+          <rect width="172" height="228" rx="6" fill="#ffffff" stroke="#e0dbd2" stroke-width="0.8"/>
+          <rect width="172" height="30" rx="6" fill="#1a1a1a"/>
+          <rect y="16" width="172" height="14" fill="#1a1a1a"/>
+          <text x="86" y="20" font-family="'DM Sans',Arial,sans-serif" font-size="8.5" font-weight="700" fill="#f0ebe2" text-anchor="middle" letter-spacing="2" opacity="0.82">CONTRATO</text>
+          <rect x="16" y="46"  width="138" height="3.5" rx="2" fill="#1a1a1a" opacity="0.10"/>
+          <rect x="16" y="57"  width="110" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="68"  width="128" height="3.5" rx="2" fill="#1a1a1a" opacity="0.10"/>
+          <rect x="16" y="79"  width="90"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.07"/>
+          <rect x="16" y="90"  width="118" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <rect x="16" y="101" width="75"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.07"/>
+          <line x1="16" y1="116" x2="154" y2="116" stroke="#1a1a1a" stroke-width="0.5" opacity="0.08"/>
+          <rect x="16" y="124" width="138" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <rect x="16" y="135" width="100" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="146" width="120" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <rect x="16" y="157" width="80"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.07"/>
+          <rect x="16" y="168" width="110" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <line x1="16" y1="200" x2="90"  y2="200" stroke="#1a1a1a" stroke-width="0.7" opacity="0.14"/>
+          <text x="16" y="214" font-family="Georgia,serif" font-size="9" fill="#1a1a1a" opacity="0.22" font-style="italic">Assinatura</text>
+          <circle cx="148" cy="206" r="15" fill="none" stroke="#1a1a1a" stroke-width="0.6" opacity="0.12"/>
+          <circle cx="148" cy="206" r="9"  fill="none" stroke="#1a1a1a" stroke-width="0.4" opacity="0.09"/>
+          <text x="148" y="209" font-family="Arial,sans-serif" font-size="5.5" fill="#1a1a1a" opacity="0.16" text-anchor="middle">CRM</text>
+        </g>
+
+        <!-- DOC 2 — CREMESP 397/2026 -->
+        <g transform="translate(238,264) rotate(0.5)">
+          <rect x="3" y="3" width="188" height="244" rx="6" fill="#1a1a1a" opacity="0.05"/>
+          <rect width="188" height="244" rx="6" fill="#faf7f3" stroke="#e0dbd2" stroke-width="0.8"/>
+          <rect width="188" height="30" rx="6" fill="#1a1a1a"/>
+          <rect y="16" width="188" height="14" fill="#1a1a1a"/>
+          <text x="94" y="20" font-family="'DM Sans',Arial,sans-serif" font-size="7.5" font-weight="700" fill="#f0ebe2" text-anchor="middle" letter-spacing="2" opacity="0.82">CREMESP 397/2026</text>
+          <circle cx="28" cy="52"  r="5" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.20"/>
+          <rect x="42" y="49"  width="118" height="3.5" rx="2" fill="#1a1a1a" opacity="0.10"/>
+          <circle cx="28" cy="70"  r="5" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.20"/>
+          <rect x="42" y="67"  width="100" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <circle cx="28" cy="88"  r="5" fill="#1a1a1a" opacity="0.14"/>
+          <path d="M24 88 L27 91 L33 85" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.80"/>
+          <rect x="42" y="85"  width="128" height="3.5" rx="2" fill="#1a1a1a" opacity="0.11"/>
+          <circle cx="28" cy="106" r="5" fill="#1a1a1a" opacity="0.14"/>
+          <path d="M24 106 L27 109 L33 103" fill="none" stroke="#ffffff" stroke-width="1.1" stroke-linecap="round" opacity="0.80"/>
+          <rect x="42" y="103" width="114" height="3.5" rx="2" fill="#1a1a1a" opacity="0.11"/>
+          <circle cx="28" cy="124" r="5" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.20"/>
+          <rect x="42" y="121" width="92"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <circle cx="28" cy="142" r="5" fill="none" stroke="#1a1a1a" stroke-width="0.7" opacity="0.20"/>
+          <rect x="42" y="139" width="106" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <line x1="16" y1="158" x2="170" y2="158" stroke="#1a1a1a" stroke-width="0.5" opacity="0.08"/>
+          <rect x="16" y="166" width="154" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="177" width="130" height="3.5" rx="2" fill="#1a1a1a" opacity="0.07"/>
+          <rect x="16" y="188" width="144" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="199" width="108" height="3.5" rx="2" fill="#1a1a1a" opacity="0.06"/>
+          <line x1="16" y1="216" x2="96"  y2="216" stroke="#1a1a1a" stroke-width="0.6" opacity="0.12"/>
+        </g>
+
+        <!-- DOC 3 — PARECER JURÍDICO -->
+        <g transform="translate(452,282) rotate(2)">
+          <rect x="3" y="3" width="166" height="222" rx="6" fill="#1a1a1a" opacity="0.05"/>
+          <rect width="166" height="222" rx="6" fill="#ffffff" stroke="#e0dbd2" stroke-width="0.8"/>
+          <rect width="166" height="30" rx="6" fill="#1a1a1a"/>
+          <rect y="16" width="166" height="14" fill="#1a1a1a"/>
+          <text x="83" y="20" font-family="'DM Sans',Arial,sans-serif" font-size="7.5" font-weight="700" fill="#f0ebe2" text-anchor="middle" letter-spacing="1.5" opacity="0.82">PARECER JURÍDICO</text>
+          <rect x="16" y="46"  width="132" height="3.5" rx="2" fill="#1a1a1a" opacity="0.10"/>
+          <rect x="16" y="57"  width="110" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="68"  width="124" height="3.5" rx="2" fill="#1a1a1a" opacity="0.10"/>
+          <rect x="16" y="79"  width="96"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="90"  width="118" height="3.5" rx="2" fill="#1a1a1a" opacity="0.09"/>
+          <rect x="16" y="106" width="132" height="18" rx="3" fill="#1a1a1a" opacity="0.05"/>
+          <rect x="16" y="111" width="96"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.22"/>
+          <rect x="16" y="134" width="132" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="145" width="108" height="3.5" rx="2" fill="#1a1a1a" opacity="0.07"/>
+          <rect x="16" y="156" width="122" height="3.5" rx="2" fill="#1a1a1a" opacity="0.08"/>
+          <rect x="16" y="167" width="86"  height="3.5" rx="2" fill="#1a1a1a" opacity="0.06"/>
+          <line x1="16" y1="186" x2="86"  y2="186" stroke="#1a1a1a" stroke-width="0.6" opacity="0.12"/>
+        </g>
+
+        <!-- BULLETS — sem label de resolução -->
+        <rect x="44" y="556" width="5" height="5" rx="1" fill="#1a1a1a" opacity="0.35"/>
+        <text x="58" y="564" font-family="'DM Sans',Arial,sans-serif" font-size="12" fill="#1a1a1a" opacity="0.55">Autonomia técnica médica</text>
+        <rect x="44" y="586" width="5" height="5" rx="1" fill="#1a1a1a" opacity="0.22"/>
+        <text x="58" y="594" font-family="'DM Sans',Arial,sans-serif" font-size="12" fill="#1a1a1a" opacity="0.42">Diretor Técnico regularizado</text>
+        <rect x="44" y="616" width="5" height="5" rx="1" fill="#1a1a1a" opacity="0.14"/>
+        <text x="58" y="624" font-family="'DM Sans',Arial,sans-serif" font-size="12" fill="#1a1a1a" opacity="0.30">Cláusulas LGPD e sigilo</text>
+
+        <!-- RODAPÉ DISCRETO -->
+        <line x1="44" y1="770" x2="636" y2="770" stroke="#1a1a1a" stroke-width="0.5" opacity="0.10"/>
+        <text x="44"  y="790" font-family="'DM Sans',Arial,sans-serif" font-size="10" fill="#1a1a1a" opacity="0.22" letter-spacing="0.3">GTB Law · Direito Médico e Compliance Regulatório</text>
+        <text x="636" y="790" font-family="'DM Sans',Arial,sans-serif" font-size="10" fill="#1a1a1a" opacity="0.18" text-anchor="end">2026</text>
+
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ QUESTIONNAIRE ═══ -->
+<section class="page" id="questionnairePage">
+<div class="q-card">
+
+  <div class="eyebrow"><span class="eyebrow-dot"></span>Questionário</div>
+  <h2>Análise preliminar de conformidade</h2>
+  <p class="q-subtitle">
+    Preencha as informações básicas da clínica e anexe o contrato atual.
+    A análise das condições contratuais será realizada diretamente a partir do documento enviado.
+  </p>
+
+  <!-- BLOCO 1: 4 campos manuais -->
+  <div class="q-grid">
+
+    <div class="field">
+      <label>Modelo de contratação atual</label>
+      <select id="q_modelo">
+        <option value="">Selecione</option>
+        <option>Prestação de Serviços (PJ)</option>
+        <option>SCP (Soc. em Conta de Participação)</option>
+        <option>CLT</option>
+        <option>Mais de um modelo</option>
+        <option>Não sei informar</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Número de profissionais médicos</label>
+      <input type="number" id="q_medicos" placeholder="Ex: 8" min="1">
+    </div>
+
+    <div class="field">
+      <label>Existe contrato formal escrito?</label>
+      <select id="q_contrato">
+        <option value="">Selecione</option>
+        <option>Sim</option>
+        <option>Não</option>
+        <option>Não sei informar</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Há Diretor Técnico formalmente indicado?</label>
+      <select id="q_diretor">
+        <option value="">Selecione</option>
+        <option>Sim, com registro ativo no CREMESP</option>
+        <option>Sim, mas sem verificação de regularidade</option>
+        <option>Não há indicação formal</option>
+        <option>Não sei informar</option>
+      </select>
+    </div>
+
+  </div>
+
+  <hr class="q-divider">
+
+  <!-- BLOCO 2: Upload -->
+  <label class="upload-label" for="uploadFile" id="uploadLabel">
+    <div class="upload-icon-wrap">📎</div>
+    <div class="upload-main-text">Anexar contrato da clínica</div>
+    <div class="upload-sub-text">PDF ou DOCX · até 10 MB<br>Clique para selecionar o arquivo</div>
+    <span class="upload-file-name" id="uploadFileName"></span>
+    <input type="file" id="uploadFile" accept=".pdf,.doc,.docx" onchange="handleFile(this)">
+  </label>
+
+  <div class="upload-info">
+    <span class="upload-info-icon">💡</span>
+    <span class="upload-info-text">
+      <strong>Por que o contrato é importante?</strong>
+      As condições contratuais — natureza da prestação, jornada, remuneração, prazo de vigência, rescisão e cláusulas regulatórias — serão extraídas e analisadas diretamente do documento, cruzando com as exigências da Resolução CREMESP 397/2026, CFM, CEM e LGPD.
+    </span>
+  </div>
+
+  <div class="q-footer">
+    <div class="q-footer-note">As informações são utilizadas exclusivamente para fins de diagnóstico preliminar.</div>
+    <div class="q-footer-actions">
+      <button class="btn btn-secondary" onclick="goTo('homePage')">Voltar</button>
+      <button class="btn btn-primary" id="btnAnalyze" onclick="runAnalysis()">
+        Gerar diagnóstico
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<!-- ═══ ANALYZING ═══ -->
+<section class="page" id="analyzingPage">
+  <div class="analyzing-wrap">
+    <div class="analyzing-ring"></div>
+    <h3>Analisando o contrato</h3>
+    <p>Aguarde enquanto processamos o documento e cruzamos com a regulação vigente.</p>
+    <div class="analyzing-steps">
+      <div class="analyzing-step active" id="step1"><span class="step-dot"></span>Lendo o documento enviado</div>
+      <div class="analyzing-step" id="step2"><span class="step-dot"></span>Extraindo cláusulas e condições</div>
+      <div class="analyzing-step" id="step3"><span class="step-dot"></span>Verificando CREMESP 397/2026 e CFM</div>
+      <div class="analyzing-step" id="step4"><span class="step-dot"></span>Consolidando o diagnóstico</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ RESULT ═══ -->
+<section class="page" id="resultPage">
+<div class="result-card">
+  <div class="eyebrow" style="margin:0 auto 20px;justify-content:center;"><span class="eyebrow-dot"></span>Diagnóstico Preliminar</div>
+  <div class="result-badge-wrap" id="resultBadge"></div>
+  <h2 id="resultTitle"></h2>
+  <p class="result-sub" id="resultSub"></p>
+  <div class="result-box" id="resultBox">
+    <div class="result-box-title" id="resultBoxTitle">Pontos identificados na análise</div>
+    <div id="resultItems"></div>
+  </div>
+  <div class="result-actions" id="resultActions">
+    <button class="btn btn-secondary" onclick="goTo('homePage')">Voltar ao início</button>
+    <button class="btn btn-cta" id="btnDeepDiag" onclick="openLeadModal()" style="display:none">
+      Diagnóstico aprofundado
+      <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="btn btn-cta" id="btnContact" onclick="openLeadModal()" style="display:none">
+      Falar com especialista
+      <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</div>
+</section>
+
+<!-- ═══ THANK YOU ═══ -->
+<section class="page" id="thankYouPage">
+  <div class="ty-wrap">
+    <div class="ty-icon">✓</div>
+    <h2>Obrigada!</h2>
+    <p>Nossa equipe entrará em contato em breve com o diagnóstico aprofundado personalizado para a sua clínica.</p>
+    <button class="btn btn-primary" onclick="goTo('homePage')" style="margin:32px auto 0;display:flex;">Voltar ao início</button>
+  </div>
+</section>
+
+</div><!-- /shell -->
+</div><!-- /app -->
+
+<!-- ═══ LEAD MODAL ═══ -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal-card">
+    <h3>Diagnóstico aprofundado</h3>
+    <p class="modal-sub">Preencha seus dados para receber a análise completa pela equipe GTB Law.</p>
+    <div class="modal-fields">
+      <div class="field"><label>Nome completo</label><input type="text" id="lead_nome" placeholder="Dr. / Dra. Nome Sobrenome"></div>
+      <div class="field"><label>Nome da clínica</label><input type="text" id="lead_clinica" placeholder="Nome da clínica / hospital"></div>
+      <div class="field"><label>E-mail</label><input type="email" id="lead_email" placeholder="email@clinica.com.br"></div>
+      <div class="field"><label>Telefone / WhatsApp</label><input type="tel" id="lead_tel" placeholder="(11) 9 9999-9999"></div>
+    </div>
+    <div class="modal-disclaimer">Seus dados são tratados com sigilo e utilizados exclusivamente para contato pela equipe GTB Law.</div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('leadModal')">Cancelar</button>
+      <button class="btn btn-primary" id="btnSendLead" onclick="submitLead()">
+        Enviar solicitação
+        <svg width="14" height="14" fill="none" viewBox="0 0 14 14"><path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ HOW MODAL ═══ -->
+<div class="modal-overlay" id="howModal">
+  <div class="modal-card" style="max-width:620px">
+    <h3>Como funciona</h3>
+    <div class="how-step"><div class="step-num">1</div><div class="step-text">Preencha as 4 informações básicas sobre a estrutura da clínica.</div></div>
+    <div class="how-step"><div class="step-num">2</div><div class="step-text">Anexe o contrato atual (PDF ou DOCX). O sistema extrai e analisa automaticamente as condições contratuais relevantes.</div></div>
+    <div class="how-step"><div class="step-num">3</div><div class="step-text">As informações são cruzadas com a Resolução CREMESP 397/2026, CFM, Código de Ética Médica e LGPD, gerando um diagnóstico preliminar.</div></div>
+    <div class="how-step"><div class="step-num">4</div><div class="step-text">Se não houver contrato ou as informações forem insuficientes, o sistema indicará a necessidade de contato com especialista jurídico.</div></div>
+    <div class="how-disclaimer">O resultado possui caráter estritamente preliminar e informativo. A validação jurídica definitiva depende de análise individualizada por advogado habilitado.</div>
+    <div style="display:flex;justify-content:flex-end;margin-top:22px;">
+      <button class="btn btn-primary" onclick="closeModal('howModal')">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ JAVASCRIPT ═══════════════════ -->
+<script>
+/* ╔══════════════════════════════════════════════════════════════╗
+   ║  CONFIGURAÇÕES                                               ║
+   ║  Após o deploy no Vercel, substitua api_url pela URL real:  ║
+   ║  ex: https://gtblaw.vercel.app/api/analyze                  ║
+   ╚══════════════════════════════════════════════════════════════╝ */
+const CONFIG = {
+  // URL do backend Vercel — substitua após o deploy
+  api_url: 'https://SEU-PROJETO.vercel.app/api/analyze',
+
+  // EmailJS (https://emailjs.com) — configure após o deploy
+  emailjs_public_key:  'SUA_EMAILJS_PUBLIC_KEY',
+  emailjs_service_id:  'SUA_EMAILJS_SERVICE_ID',
+  emailjs_template_id: 'SUA_EMAILJS_TEMPLATE_ID',
+
+  // WhatsApp — só dígitos com código do país: ex '5511999999999'
+  whatsapp_number: 'SEU_NUMERO_WHATSAPP'
+};
+
+/* ─── ESTADO ─── */
+const state = {
+  modelo: '', medicos: '', contrato: '', diretor: '',
+  fileBase64: null, fileName: null, fileType: null,
+  diagnosis: null, hasFile: false
+};
+
+/* ─── NAVEGAÇÃO ─── */
+function goTo(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const t=document.getElementById(id);
+  if(t){t.classList.add('active');t.scrollTop=0;}
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+/* ─── UPLOAD ─── */
+function handleFile(input){
+  const file=input.files[0];
+  if(!file)return;
+  state.fileName=file.name;
+  state.fileType=file.type||'application/octet-stream';
+  state.hasFile=true;
+
+  const label=document.getElementById('uploadLabel');
+  label.classList.add('has-file');
+  document.getElementById('uploadFileName').textContent='✓ '+file.name;
+
+  const reader=new FileReader();
+  reader.onload=e=>{state.fileBase64=e.target.result.split(',')[1];};
+  reader.readAsDataURL(file);
+}
+
+/* ─── ANÁLISE PRINCIPAL ─── */
+async function runAnalysis(){
+  state.modelo   = document.getElementById('q_modelo').value;
+  state.medicos  = document.getElementById('q_medicos').value;
+  state.contrato = document.getElementById('q_contrato').value;
+  state.diretor  = document.getElementById('q_diretor').value;
+
+  document.getElementById('btnAnalyze').disabled = true;
+  goTo('analyzingPage');
+  animateSteps();
+
+  try{
+    let result;
+
+    // ── SEM CONTRATO ──
+    if(!state.hasFile){
+      result = {
+        status: 'INSUFICIENTE',
+        titulo: 'Contrato não enviado',
+        resumo: 'Não há informações suficientes para determinar se a clínica está em conformidade com as resoluções do CREMESP. O envio do contrato é indispensável para a análise preliminar.',
+        pontos: [],
+        observacoes: 'Indicado o contato com especialista jurídico para diagnóstico específico.'
+      };
+
+    // ── ANÁLISE VIA BACKEND VERCEL ──
+    } else {
+      result = await claudeAnalysis();
+    }
+
+    state.diagnosis = result;
+    renderResult(result);
+
+  } catch(err){
+    console.error('Erro na análise:', err);
+    state.diagnosis = {
+      status: 'ERRO',
+      titulo: 'Não foi possível concluir a análise',
+      resumo: 'Ocorreu um erro ao processar o documento. Verifique sua conexão e tente novamente, ou entre em contato com a equipe GTB Law para análise direta.',
+      pontos: [],
+      observacoes: null
+    };
+    renderResult(state.diagnosis);
+  }
+
+  document.getElementById('btnAnalyze').disabled = false;
+  goTo('resultPage');
+}
+
+/* ─── ANIMAÇÃO DE STEPS ─── */
+function animateSteps(){
+  const steps=['step1','step2','step3','step4'];
+  let i=0;
+  const iv=setInterval(()=>{
+    steps.forEach(s=>document.getElementById(s).classList.remove('active'));
+    if(i<steps.length){
+      document.getElementById(steps[i]).classList.add('active');
+      i++;
+    }else{
+      clearInterval(iv);
+    }
+  },900);
+}
+
+
+
+/* ─── CHAMADA AO BACKEND VERCEL ─── */
+async function claudeAnalysis(){
+  const resp = await fetch(CONFIG.api_url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      modelo:    state.modelo,
+      medicos:   state.medicos,
+      contrato:  state.contrato,
+      diretor:   state.diretor,
+      fileName:  state.fileName,
+      fileBase64: state.fileBase64,
+      fileType:  state.fileType
+    })
+  });
+
+  if(!resp.ok){
+    const err = await resp.json().catch(()=>({}));
+    throw new Error(err?.resumo || `HTTP ${resp.status}`);
+  }
+
+  return await resp.json();
+}
+
+/* ─── RENDERIZA RESULTADO ─── */
+function renderResult(d){
+  const isOk    = d.status === 'CONFORME';
+  const isInsuf = d.status === 'INSUFICIENTE';
+  const isError = d.status === 'ERRO';
+
+  // Badge
+  let badgeClass, badgeIcon, badgeText;
+  if(isOk)         { badgeClass='badge-green'; badgeIcon='✓'; badgeText='Aparenta conformidade'; }
+  else if(isInsuf) { badgeClass='badge-amber'; badgeIcon='?'; badgeText='Informações insuficientes'; }
+  else if(isError) { badgeClass='badge-amber'; badgeIcon='!'; badgeText='Não foi possível analisar'; }
+  else             { badgeClass='badge-red';   badgeIcon='⚠'; badgeText='Desconformidade relevante'; }
+
+  document.getElementById('resultBadge').innerHTML =
+    `<div class="result-status-badge ${badgeClass}">${badgeIcon}&nbsp;&nbsp;${badgeText}</div>`;
+
+  document.getElementById('resultTitle').textContent = d.titulo || (
+    isOk    ? 'Aparenta estar em conformidade' :
+    isInsuf ? 'Informações insuficientes para análise' :
+    isError ? 'Análise não concluída' :
+              'Aparenta estar em desconformidade'
+  );
+
+  // Resumo + observações
+  let subText = d.resumo || '';
+  if(d.observacoes) subText += (subText ? ' ' : '') + d.observacoes;
+  document.getElementById('resultSub').textContent = subText;
+
+  // Pontos
+  const pontos = d.pontos || [];
+  const boxTitle = document.getElementById('resultBoxTitle');
+
+  if(isInsuf){
+    boxTitle.textContent = 'Ação necessária';
+    document.getElementById('resultItems').innerHTML =
+      '<div class="result-item"><div class="r-dot r-dot-amber">!</div>Envie o contrato da clínica para que a análise possa ser realizada.</div>';
+  } else if(isError){
+    boxTitle.textContent = 'O que aconteceu';
+    document.getElementById('resultItems').innerHTML =
+      '<div class="result-item"><div class="r-dot r-dot-amber">!</div>' + (d.resumo || 'Não foi possível processar o documento. Tente novamente ou entre em contato com a equipe GTB Law.') + '</div>';
+  } else if(pontos.length === 0){
+    boxTitle.textContent = 'Resultado da análise';
+    document.getElementById('resultItems').innerHTML =
+      '<div class="result-item"><div class="r-dot r-dot-green">✓</div>Nenhum ponto crítico identificado nesta análise preliminar.</div>';
+  } else {
+    boxTitle.textContent = 'Pontos identificados na análise';
+    document.getElementById('resultItems').innerHTML = pontos.map(p => {
+      const dotClass = p.tipo === 'ok' ? 'r-dot-green' : p.tipo === 'atencao' ? 'r-dot-amber' : 'r-dot-red';
+      const icon     = p.tipo === 'ok' ? '✓' : p.tipo === 'atencao' ? '!' : '✕';
+      return `<div class="result-item"><div class="r-dot ${dotClass}">${icon}</div><span>${p.texto}</span></div>`;
+    }).join('');
+  }
+
+  // Botões CTA
+  const btnDeep    = document.getElementById('btnDeepDiag');
+  const btnContact = document.getElementById('btnContact');
+  if(isInsuf || isError){
+    btnDeep.style.display    = 'none';
+    btnContact.style.display = 'inline-flex';
+  } else {
+    btnDeep.style.display    = 'inline-flex';
+    btnContact.style.display = 'none';
+  }
+}
+
+/* ─── LEAD MODAL ─── */
+function openLeadModal(){openModal('leadModal');}
+
+async function submitLead(){
+  const nome    = document.getElementById('lead_nome').value.trim();
+  const clinica = document.getElementById('lead_clinica').value.trim();
+  const email   = document.getElementById('lead_email').value.trim();
+  const tel     = document.getElementById('lead_tel').value.trim();
+
+  if(!nome||!email||!tel){alert('Por favor, preencha nome, e-mail e telefone.');return;}
+
+  const btn=document.getElementById('btnSendLead');
+  btn.disabled=true;btn.textContent='Enviando…';
+
+  const d=state.diagnosis||{};
+  const pontosTxt=(d.pontos||[]).map(p=>`• ${p.texto}`).join('\n');
+
+  // ── WHATSAPP ──
+  if(CONFIG.whatsapp_number&&CONFIG.whatsapp_number!=='SEU_NUMERO_WHATSAPP'){
+    const msg=encodeURIComponent(
+      `🏥 *NOVO LEAD — GTB Law Compliance Médico*\n\n`+
+      `*Nome:* ${nome}\n*Clínica:* ${clinica||'—'}\n*Tel:* ${tel}\n*E-mail:* ${email}\n\n`+
+      `*Diagnóstico:* ${d.status||'—'}\n*Resumo:* ${d.resumo||'—'}\n\n`+
+      `*Pontos identificados:*\n${pontosTxt||'—'}\n\n`+
+      `*Modelo declarado:* ${state.modelo||'—'}\n`+
+      `*Nº médicos:* ${state.medicos||'—'}\n`+
+      `*Diretor Técnico:* ${state.diretor||'—'}\n`+
+      `*Contrato enviado:* ${state.fileName||'Não enviado'}`
+    );
+    window.open(`https://wa.me/${CONFIG.whatsapp_number}?text=${msg}`,'_blank');
+  }
+
+  // ── EMAIL via EmailJS ──
+  if(CONFIG.emailjs_public_key&&CONFIG.emailjs_public_key!=='SUA_EMAILJS_PUBLIC_KEY'){
+    try{
+      emailjs.init(CONFIG.emailjs_public_key);
+      await emailjs.send(CONFIG.emailjs_service_id,CONFIG.emailjs_template_id,{
+        lead_nome:nome,lead_clinica:clinica,lead_email:email,lead_tel:tel,
+        diagnostico:d.status||'—',resumo:d.resumo||'—',
+        pontos:pontosTxt||'—',
+        modelo:state.modelo||'—',
+        medicos:state.medicos||'—',
+        contrato_existente:state.contrato||'—',
+        diretor:state.diretor||'—',
+        contrato_arquivo:state.fileName||'Não enviado',
+        observacoes:d.observacoes||'—'
+      });
+    }catch(e){console.warn('EmailJS:',e);}
+  }
+
+  closeModal('leadModal');
+  goTo('thankYouPage');
+}
+</script>
+
+</body>
+</html>
