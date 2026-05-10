@@ -2,7 +2,6 @@ export const config = { api: { bodyParser: { sizeLimit: '12mb' } } };
 
 export default async function handler(req, res) {
 
-  // CORS — permite chamadas do seu domínio
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -22,38 +21,47 @@ export default async function handler(req, res) {
       });
     }
 
-    // Monta o conteúdo para o Claude
     const userContent = [];
-
-    // Anexa o contrato
     const isPdf = fileType === 'application/pdf' || (fileName || '').toLowerCase().endsWith('.pdf');
-    userContent.push({
-      type: 'document',
-      source: {
-        type: 'base64',
-        media_type: isPdf
-          ? 'application/pdf'
-          : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        data: fileBase64
-      }
-    });
 
-    // Instrução de análise
+    if (isPdf) {
+      // PDF: Claude lê nativamente
+      userContent.push({
+        type: 'document',
+        source: { type: 'base64', media_type: 'application/pdf', data: fileBase64 }
+      });
+    } else {
+      // DOCX: extrai texto das tags XML internas
+      let docText = '';
+      try {
+        const buf = Buffer.from(fileBase64, 'base64');
+        const raw = buf.toString('latin1', 0, Math.min(buf.length, 800000));
+        const matches = raw.match(/<w:t[^>]*>([^<]+)<\/w:t>/g) || [];
+        docText = matches.map(m => m.replace(/<[^>]+>/g, '')).join(' ').replace(/\s+/g, ' ').trim();
+      } catch(e) { docText = ''; }
+
+      userContent.push({
+        type: 'text',
+        text: docText.length > 100
+          ? `CONTEÚDO DO CONTRATO (${fileName}):\n\n${docText.substring(0, 50000)}`
+          : `O arquivo "${fileName}" foi enviado mas não foi possível extrair seu conteúdo. Gere o diagnóstico com base apenas nas informações do questionário e indique que a leitura do documento não foi possível.`
+      });
+    }
+
     userContent.push({
       type: 'text',
-      text: `Leia o contrato acima na íntegra e gere o diagnóstico de compliance com base exclusivamente no que está escrito nele.
+      text: `Leia o contrato acima e gere o diagnóstico de compliance.
 
-INFORMAÇÕES DECLARADAS PELA CLÍNICA:
+INFORMAÇÕES DA CLÍNICA:
 - Modelo de contratação: ${modelo || 'Não informado'}
-- Número de profissionais médicos: ${medicos || 'Não informado'}
-- Confirma existência de contrato formal: ${contrato || 'Não informado'}
+- Número de médicos: ${medicos || 'Não informado'}
+- Contrato formal: ${contrato || 'Não informado'}
 - Diretor Técnico: ${diretor || 'Não informado'}
-- Nome do arquivo enviado: ${fileName || 'Não informado'}
+- Arquivo: ${fileName || 'Não informado'}
 
-Cada ponto do diagnóstico deve ser redigido com base no que você encontrou (ou não encontrou) neste contrato específico. Não use textos pré-definidos. Responda em JSON conforme especificado.`
+Responda em JSON conforme especificado no system prompt.`
     });
 
-    // Chama a API da Anthropic
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -77,73 +85,38 @@ Cada ponto do diagnóstico deve ser redigido com base no que você encontrou (ou
     const data = await response.json();
     const raw = data.content?.[0]?.text || '{}';
     const clean = raw.replace(/^```(?:json)?\s*/, '').replace(/\s*```$/, '').trim();
-    const result = JSON.parse(clean);
-
-    return res.status(200).json(result);
+    return res.status(200).json(JSON.parse(clean));
 
   } catch (err) {
     console.error('analyze error:', err);
     return res.status(500).json({
       status: 'ERRO',
       titulo: 'Não foi possível concluir a análise',
-      resumo: 'Ocorreu um erro ao processar o documento. Tente novamente ou entre em contato com a equipe GTB Law para análise direta.',
+      resumo: 'Ocorreu um erro ao processar o documento. Tente novamente ou entre em contato com a equipe GTB Law.',
       pontos: [],
       observacoes: null
     });
   }
 }
 
-// ─── SYSTEM PROMPT ───────────────────────────────────────────────────────────
 const SYSTEM_PROMPT = `Você é um assistente jurídico especializado em direito médico e compliance contratual no estado de São Paulo.
 
-Você receberá o texto de um contrato médico (PDF ou DOCX) e informações básicas da clínica. Sua tarefa é ler o contrato integralmente e identificar, com base no que está EFETIVAMENTE escrito no documento, os pontos de conformidade e desconformidade com:
+Leia o contrato integralmente e identifique, com base no que está EFETIVAMENTE escrito, os pontos de conformidade e desconformidade com:
+1. Resolução CREMESP 397/2026 — autonomia técnica, Diretor Técnico, responsabilidade técnica
+2. Código de Ética Médica (CFM) — autonomia profissional, sigilo e prontuário
+3. Resoluções CFM 1638/2002 e 2218/2018 — prontuário médico
+4. LGPD (Lei 13.709/2018) — dados sensíveis de saúde
+5. CLT — sinais de subordinação e vínculo empregatício
 
-1. Resolução CREMESP 397/2026 — autonomia técnica médica, indicação e regularidade do Diretor Técnico, responsabilidade técnica, modelos de contratação permitidos
-2. Código de Ética Médica (CFM) — preservação da autonomia profissional, sigilo médico e prontuário
-3. Resoluções CFM 1638/2002 e 2218/2018 — prontuário médico: guarda, acesso e responsabilidade
-4. LGPD (Lei 13.709/2018) — tratamento de dados sensíveis de saúde, base legal, responsável pelo tratamento
-5. CLT — sinais de subordinação que possam caracterizar vínculo empregatício não declarado
+Verifique: natureza da prestação, local de trabalho, jornada, subordinação, remuneração, pagamento, prazo de vigência, rescisão, responsabilidades, autonomia técnica, Diretor Técnico, SCP, prontuário/sigilo, LGPD.
 
-Para cada item abaixo, leia o contrato e determine se está presente, ausente ou incompleto. Redija cada ponto com base no que você ENCONTROU (ou não encontrou) no documento — nunca use textos genéricos ou pré-definidos:
+Cada ponto deve descrever especificamente o que foi encontrado ou a ausência identificada NO CONTRATO ANALISADO. Não use frases genéricas.
 
-ITENS A VERIFICAR NO CONTRATO:
-— Natureza e objeto da prestação de serviços (como está descrita)
-— Local de trabalho (fixo, variável, determinado ou indeterminado)
-— Horário, jornada ou escala (prevista ou não)
-— Sinais de subordinação direta: ordens, controle de frequência, exclusividade
-— Forma de remuneração (fixa, variável, por produção, salário)
-— Periodicidade e data de pagamento
-— Prazo de vigência e condições de renovação
-— Regras de rescisão e prazo de notificação prévia
-— Definição de responsabilidades de cada parte
-— Cláusula expressa de autonomia técnica médica
-— Indicação formal do Diretor Técnico e menção à regularidade perante o CREMESP
-— Existência de SCP ou referência a modelo societário
-— Cláusula sobre prontuário médico e sigilo profissional
-— Cláusula LGPD / confidencialidade / proteção de dados
-
-IMPORTANTE:
-- Cada ponto deve descrever especificamente o que foi encontrado ou a ausência identificada NO CONTRATO ANALISADO
-- Não use frases genéricas ou padrão. Referencie o que o contrato diz ou deixa de dizer
-- Se uma cláusula existe mas é insuficiente, diga o que falta especificamente
-- Se uma cláusula está adequada, confirme e descreva brevemente
-- O resumo deve ser específico para este contrato, não genérico
-
-Responda SOMENTE em JSON válido, sem markdown, sem texto fora do JSON:
+Responda SOMENTE em JSON válido, sem markdown:
 {
   "status": "CONFORME" | "DESCONFORME" | "INSUFICIENTE",
-  "titulo": "frase descritiva de até 10 palavras sobre este contrato específico",
-  "resumo": "síntese objetiva de até 40 palavras sobre o que foi encontrado neste contrato",
-  "pontos": [
-    {
-      "tipo": "critico" | "atencao" | "ok",
-      "texto": "descrição específica baseada no conteúdo do contrato analisado — mínimo 10, máximo 30 palavras"
-    }
-  ],
-  "observacoes": "observação técnica adicional específica para este contrato, se relevante — até 2 frases"
-}
-
-Classificação:
-- "critico": ausência ou redação que gera risco regulatório direto
-- "atencao": presente mas com lacunas ou imprecisões que merecem revisão
-- "ok": cláusula existente e adequada às exigências regulatórias`;
+  "titulo": "frase descritiva de até 10 palavras sobre este contrato",
+  "resumo": "síntese objetiva de até 40 palavras",
+  "pontos": [{"tipo": "critico"|"atencao"|"ok", "texto": "descrição específica de 10 a 30 palavras"}],
+  "observacoes": "observação técnica adicional, se relevante"
+}`;
